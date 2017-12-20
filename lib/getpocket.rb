@@ -8,26 +8,54 @@ require 'uri'
 class GetPocket
   Error = Class.new(::StandardError)
 
-  def initialize(host, consumer_key, access_key = nil)
+  def initialize(host, consumer_key, access_token = nil)
     @host = host
     @consumer_key = consumer_key
-    @access_key = access_key
+    @access_token = access_token
   end
 
-  def obtain_access_token
+  def obtain_access_token(request_token)
+    json = post!(
+      '/v3/oauth/authorize',
+      consumer_key: @consumer_key,
+      code: request_token
+    )
+
+    json['access_token'] || raise(Error, 'Access Token not present')
   end
 
   def obtain_request_token
-    json = post!(
-      '/v3/oauth/request',
-      consumer_key: @consumer_key,
-      redirect_uri: "http://#{@host}/getpocket/auth_done"
-    )
+    @request_token ||=
+      begin
+        json = post!(
+          '/v3/oauth/request',
+          consumer_key: @consumer_key,
+          redirect_uri: redirect_uri
+        )
 
-    @request_token = json['code'] || raise(Error, 'Request Code not present')
+        json['code'] || raise(Error, 'Request Code not present')
+      end
+  end
+
+  def authorize_url
+    obtain_request_token
+
+    format(
+      'https://getpocket.com/auth/authorize?request_token=%s&redirect_uri=%s',
+      escape(@request_token),
+      escape(redirect_uri)
+    )
+  end
+
+  def redirect_uri
+    "http://#{@host}/getpocket/auth_done"
   end
 
   private
+
+  def escape(str)
+    URI.encode_www_form_component(str)
+  end
 
   def post!(path, params = {})
     uri = make_uri(path)
