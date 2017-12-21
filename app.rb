@@ -4,7 +4,7 @@ require 'bundler/setup'
 require 'sinatra'
 require_relative './lib/getpocket'
 
-CONSUMER_KEY = IO.read(File.expand_path('~/.getpocket-consumer-key')).strip.freeze
+CONSUMER_KEY = ENV['GETPOCKET_CONSUMER_KEY']
 
 set :session_secret, ENV.fetch('SESSION_SECRET') { SecureRandom.hex(64) }
 enable :sessions
@@ -21,7 +21,10 @@ helpers do
   end
 
   def getpocket
-    @getpocket ||= GetPocket.new('u1.vpn:9292', CONSUMER_KEY, session['access_token'])
+    @getpocket ||= GetPocket.new(
+      ENV['GETPOCKET_REDIRECT_HOST'],
+      CONSUMER_KEY, session['access_token']
+    )
   end
 end
 
