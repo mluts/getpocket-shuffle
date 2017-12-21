@@ -21,6 +21,10 @@ class GetPocket
       @json['item_id']
     end
 
+    def url
+      "https://getpocket.com/a/read/#{id}"
+    end
+
     def to_json(*args)
       @json.to_json(*args)
     end
@@ -86,7 +90,7 @@ class GetPocket
       sort: sort
     )
 
-    json['list'].lazy.map { |item| Article.new(item) }
+    json['list'].values.lazy.map { |item| Article.new(item) }
   end
 
   private

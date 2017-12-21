@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <title>Getpocket Shuffle</title>
+  </head>
+  <body>
+    <ul>
+      <% articles.each do |article| %>
+        <li>
+          <a href="<%= article.url %>">
+            <%= article.url %>
+          </a>
+        </li>
+      <% end %>
+    </ul>
+  </body>
+</html>
