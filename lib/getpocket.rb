@@ -8,6 +8,31 @@ require 'uri'
 class GetPocket
   Error = Class.new(::StandardError)
 
+  SORT_NEWEST = 'newest'
+  SORT_OLDEST = 'oldest'
+
+  # Article Item
+  class Article
+    def initialize(json)
+      @json = json.to_h
+    end
+
+    def id
+      @json['item_id']
+    end
+
+    def to_json(*args)
+      @json.to_json(*args)
+    end
+
+    def ==(other)
+      json == other.json
+    end
+
+    attr_reader :json
+    protected :json
+  end
+
   def initialize(host, consumer_key, access_token = nil)
     @host = host
     @consumer_key = consumer_key
@@ -21,7 +46,7 @@ class GetPocket
       code: request_token
     )
 
-    json['access_token'] || raise(Error, 'Access Token not present')
+    @access_token = json['access_token'] || raise(Error, 'Access Token not present')
   end
 
   def obtain_request_token
@@ -49,6 +74,19 @@ class GetPocket
 
   def redirect_uri
     "http://#{@host}/getpocket/auth_done"
+  end
+
+  def get_articles(count: 10, offset: 0, sort: SORT_NEWEST)
+    json = post!(
+      '/v3/get',
+      access_token: @access_token,
+      consumer_key: @consumer_key,
+      count: count,
+      offset: offset,
+      sort: sort
+    )
+
+    json['list'].lazy.map { |item| Article.new(item) }
   end
 
   private
