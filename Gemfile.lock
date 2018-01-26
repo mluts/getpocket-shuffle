@@ -6,6 +6,7 @@ GEM
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     hashdiff (0.3.7)
+    kgio (2.11.1)
     minitest (5.10.3)
     mustermann (1.0.1)
     public_suffix (3.0.1)
@@ -14,6 +15,7 @@ GEM
       rack
     rack-test (0.8.2)
       rack (>= 1.0, < 3)
+    raindrops (0.19.0)
     rake (12.3.0)
     safe_yaml (1.0.4)
     sinatra (2.0.0)
@@ -22,6 +24,9 @@ GEM
       rack-protection (= 2.0.0)
       tilt (~> 2.0)
     tilt (2.0.8)
+    unicorn (5.4.0)
+      kgio (~> 2.6)
+      raindrops (~> 0.7)
     webmock (3.1.1)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -35,7 +40,8 @@ DEPENDENCIES
   rack-test
   rake
   sinatra (~> 2.0)
+  unicorn
   webmock
 
 BUNDLED WITH
-   1.16.0
+   1.16.1
